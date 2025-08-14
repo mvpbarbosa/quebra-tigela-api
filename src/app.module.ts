@@ -1,20 +1,30 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule } from './config/config.module';
+import { ConfigModule } from '@nestjs/config';
+import configuration from './config/configuration';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ArtistsModule } from './artists/artists.module';
-import { ServicesModule } from './services.module';
-import { ServicesService } from './services/services.service';
-import { ServicesController } from './services/services.controller';
+import { ServicesModule } from './services/services.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { RequestsModule } from './requests/requests.module';
 import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
-  imports: [ConfigModule, AuthModule, UsersModule, ArtistsModule, ServicesModule, ScheduleModule, RequestsModule, ReviewsModule],
-  controllers: [AppController, ServicesController],
-  providers: [AppService, ServicesService],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+    MongooseModule.forRoot(
+      process.env.MONGODB_URI
+        ? process.env.MONGODB_URI
+        : 'mongodb://localhost:27017/myapp',
+    ),
+    AuthModule,
+    UsersModule,
+    ArtistsModule,
+    ServicesModule,
+    ScheduleModule,
+    RequestsModule,
+    ReviewsModule,
+  ],
 })
 export class AppModule {}
