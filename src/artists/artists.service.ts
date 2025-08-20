@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Artist, ArtistDocument } from './schemas/artist.schema';
@@ -24,7 +24,23 @@ export class ArtistsService {
   ) {}
 
   async create(payload: any) {
-    return this.artistModel.create(payload);
+    try {
+      return await this.artistModel.create(payload);
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new ConflictException(
+          `O campo '${Object.keys(error.keyPattern)[0]}' com valor '${Object.values(error.keyValue)[0]}' já está em uso.`,
+        );
+      }
+
+      if (error.name === 'ValidationError') {
+        throw new BadRequestException('Erro de validação: ' + error.message);
+      }
+
+      throw new InternalServerErrorException(
+        'Erro ao criar artista: ' + error.message,
+      );
+    }
   }
 
   // RF03: filtro por cidade; RF04: filtro por tipo; apenas verificados e com ao menos 1 serviço ativo
