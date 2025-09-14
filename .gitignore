@@ -54,3 +54,13 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Arquivos locais / pacotes gerados
+verify.js
+*.tgz
+*.zip
+quebra-tigela-api-share.tgz
+
+# Só precisa se você NÃO for usar monorepo
+pnpm-workspace.yaml
+
