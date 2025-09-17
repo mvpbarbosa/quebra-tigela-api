@@ -46,4 +46,51 @@ export class CreateArtistDto {
     message: "O campo 'artTypes' é obrigatório e não pode estar vazio",
   })
   artTypes: string[];
+
+  // Novos campos sugeridos para cadastro mais completo:
+  @IsOptional()
+  @IsString({ message: "O campo 'nome artístico' deve ser um texto" })
+  artisticName?: string;
+
+  @IsOptional()
+  @IsString({
+    message: "O campo 'data de nascimento' deve ser uma data válida",
+  })
+  birthDate?: string;
+
+  @IsOptional()
+  @IsString({ message: "O campo 'documento com foto' deve ser um texto" })
+  documentPhoto?: string;
+
+  @IsOptional()
+  @IsBoolean({ message: "O campo 'possui MEI' deve ser verdadeiro ou falso" })
+  hasMEI?: boolean;
+
+  @IsOptional()
+  @IsString({ message: "O campo 'CCMEI' deve ser um texto" })
+  ccmeiCertificate?: string;
+
+  @IsOptional()
+  @IsString({ message: "O campo 'grau de instrução' deve ser um texto" })
+  educationLevel?: string;
+
+  @IsOptional()
+  @IsString({ message: "O campo 'segmento cultural' deve ser um texto" })
+  culturalSegment?: string;
+
+  @IsOptional()
+  @IsString({ message: "O campo 'função específica' deve ser um texto" })
+  specificFunction?: string;
+
+  @IsOptional()
+  @IsString({ message: "O campo 'qualificação' deve ser um texto" })
+  qualification?: string;
+
+  @IsOptional()
+  @IsString({ message: "O campo 'portfólio' deve ser um texto" })
+  portfolio?: string;
+
+  @IsOptional()
+  @IsArray({ message: "O campo 'redes sociais' deve ser uma lista de textos" })
+  socialLinks?: string[];
 }

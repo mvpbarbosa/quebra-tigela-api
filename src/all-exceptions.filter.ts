@@ -14,7 +14,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
 
-    // Exceções HTTP normais
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const res = exception.getResponse();
@@ -26,7 +25,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       });
     }
 
-    // Erro de duplicate key do Mongo
     if (exception.code === 11000) {
       const campo = Object.keys(exception.keyPattern)[0];
       const valor = exception.keyValue[campo];
@@ -42,7 +40,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       });
     }
 
-    // Qualquer outro erro inesperado
     const internal = new InternalServerErrorException(
       'Erro interno do servidor',
     );

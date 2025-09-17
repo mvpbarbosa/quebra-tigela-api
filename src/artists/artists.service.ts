@@ -1,4 +1,10 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Artist, ArtistDocument } from './schemas/artist.schema';
@@ -11,6 +17,8 @@ import {
   ScheduleDocument,
 } from '../schedule/schemas/schedule.schema';
 import { Review, ReviewDocument } from '../reviews/schemas/review.schema';
+import { CreateArtistDto } from './dto/create-artist.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ArtistsService {
@@ -23,20 +31,26 @@ export class ArtistsService {
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
   ) {}
 
-  async create(payload: any) {
+  async create(payload: CreateArtistDto): Promise<Artist> {
     try {
-      return await this.artistModel.create(payload);
-    } catch (error) {
+      // Gera o hash da senha antes de salvar
+      const { password, ...rest } = payload;
+      const passwordHash = await bcrypt.hash(password, 10);
+      const artist = new this.artistModel({ ...rest, passwordHash });
+      await artist.save();
+      // Remove o campo sensível do retorno
+      const obj = artist.toObject();
+      delete (obj as { passwordHash?: string }).passwordHash;
+      return obj as Artist;
+    } catch (error: any) {
       if (error.code === 11000) {
         throw new ConflictException(
           `O campo '${Object.keys(error.keyPattern)[0]}' com valor '${Object.values(error.keyValue)[0]}' já está em uso.`,
         );
       }
-
       if (error.name === 'ValidationError') {
         throw new BadRequestException('Erro de validação: ' + error.message);
       }
-
       throw new InternalServerErrorException(
         'Erro ao criar artista: ' + error.message,
       );
@@ -103,10 +117,15 @@ export class ArtistsService {
     ]);
     return artists as Artist[];
   }
-  async profile(artistId: string): Promise<any> {
+  async profile(artistId: string): Promise<{
+    artist: Omit<Artist, 'passwordHash'>;
+    services: ServiceOffering[];
+    schedule: ScheduleEntry[];
+    rating: { avg: number | null; count: number };
+  }> {
     const _id = new Types.ObjectId(artistId);
-    const artist = await this.artistModel.findById(_id).lean();
-    if (!artist || !artist.verified)
+    const artistDoc = await this.artistModel.findById(_id).lean();
+    if (!artistDoc || !artistDoc.verified)
       throw new NotFoundException('Artist not found/verified');
 
     const [services, schedule, ratingAgg] = await Promise.all([
@@ -132,7 +151,56 @@ export class ArtistsService {
       ]),
     ]);
 
-    const rating = ratingAgg[0] ?? { avg: null, count: 0 };
-    return { ...artist, services, schedule, rating };
+    const agg = ratingAgg[0] ?? { avg: null, count: 0 };
+    const rating = {
+      avg: agg.avg != null ? Number(agg.avg) : null,
+      count: typeof agg.count === 'number' ? agg.count : Number(agg.count || 0),
+    };
+
+    // Remove o campo sensível antes de retornar
+    const { passwordHash, ...safeArtist } = artistDoc;
+    return {
+      artist: safeArtist as Omit<Artist, 'passwordHash'>,
+      services,
+      schedule,
+      rating,
+    };
+  }
+
+  async findAll(): Promise<Artist[]> {
+    return this.artistModel.find().select('-passwordHash').lean();
+  }
+
+  async findById(id: string): Promise<Artist | null> {
+    const artist = await this.artistModel
+      .findById(id)
+      .select('-passwordHash')
+      .lean();
+    if (!artist) throw new NotFoundException('Artista não encontrado');
+    return artist;
+  }
+
+  async update(id: string, payload: Partial<CreateArtistDto>): Promise<Artist> {
+    if (payload.password) {
+      // Se for atualizar a senha, gera o hash
+      const passwordHash = await bcrypt.hash(payload.password, 10);
+      // Remove o campo password do payload e adiciona passwordHash
+      const { password, ...rest } = payload;
+      Object.assign(rest, { passwordHash });
+      payload = rest;
+    }
+    const updated = await this.artistModel
+      .findByIdAndUpdate(id, payload, { new: true })
+      .select('-passwordHash')
+      .lean();
+    if (!updated) throw new NotFoundException('Artista não encontrado');
+    return updated as Artist;
+  }
+
+  async remove(id: string): Promise<{ deleted: boolean }> {
+    const result = await this.artistModel.deleteOne({ _id: id });
+    if (result.deletedCount === 0)
+      throw new NotFoundException('Artista não encontrado');
+    return { deleted: true };
   }
 }
