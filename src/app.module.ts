@@ -9,6 +9,8 @@ import { ServicesModule } from './services/services.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { RequestsModule } from './requests/requests.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { MailModule } from './mail/mail.module';
+import { PasswordResetModule } from './auth/password-reset.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { ReviewsModule } from './reviews/reviews.module';
     ScheduleModule,
     RequestsModule,
     ReviewsModule,
+    MailModule,
+    PasswordResetModule,
   ],
 })
 export class AppModule {}
