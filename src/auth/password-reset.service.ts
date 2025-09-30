@@ -41,7 +41,6 @@ export class PasswordResetService {
     const expiresAt = new Date(Date.now() + 6 * 60 * 1000); // 6 minutos
 
     await this.resetModel.create({ email, code, expiresAt, used: false });
-    console.log("Passei 2")
     await this.mailService.sendResetCode(email, code);
     return { message: 'Código enviado para o e-mail' };
   }
