@@ -11,6 +11,7 @@ import { RequestsModule } from './requests/requests.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { MailModule } from './mail/mail.module';
 import { PasswordResetModule } from './auth/password-reset.module';
+import { FaceComparisonModule } from './face-comparison/face-comparison.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PasswordResetModule } from './auth/password-reset.module';
     ReviewsModule,
     MailModule,
     PasswordResetModule,
+    FaceComparisonModule,
   ],
 })
 export class AppModule {}
