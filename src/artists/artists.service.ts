@@ -33,12 +33,11 @@ export class ArtistsService {
 
   async create(payload: CreateArtistDto): Promise<Artist> {
     try {
-      // Gera o hash da senha antes de salvar
       const { password, ...rest } = payload;
       const passwordHash = await bcrypt.hash(password, 10);
       const artist = new this.artistModel({ ...rest, passwordHash });
       await artist.save();
-      // Remove o campo sensível do retorno
+
       const obj = artist.toObject();
       delete (obj as { passwordHash?: string }).passwordHash;
       return obj as Artist;
@@ -57,7 +56,6 @@ export class ArtistsService {
     }
   }
 
-  // RF03: filtro por cidade; RF04: filtro por tipo; apenas verificados e com ao menos 1 serviço ativo
   async search({
     city,
     artType,
@@ -75,7 +73,6 @@ export class ArtistsService {
     if (city) match.city = city;
     if (artType) match.artTypes = artType;
 
-    // filtrar com pelo menos 1 serviço ativo
     const artists = await this.artistModel.aggregate([
       { $match: match },
       {
@@ -89,7 +86,6 @@ export class ArtistsService {
       },
       { $addFields: { activeServicesCount: { $size: '$services' } } },
       { $match: { activeServicesCount: { $gt: 0 } } },
-      // média de rating
       {
         $lookup: {
           from: 'reviews',
@@ -157,7 +153,6 @@ export class ArtistsService {
       count: typeof agg.count === 'number' ? agg.count : Number(agg.count || 0),
     };
 
-    // Remove o campo sensível antes de retornar
     const { passwordHash, ...safeArtist } = artistDoc;
     return {
       artist: safeArtist as Omit<Artist, 'passwordHash'>,
@@ -182,9 +177,7 @@ export class ArtistsService {
 
   async update(id: string, payload: Partial<CreateArtistDto>): Promise<Artist> {
     if (payload.password) {
-      // Se for atualizar a senha, gera o hash
       const passwordHash = await bcrypt.hash(payload.password, 10);
-      // Remove o campo password do payload e adiciona passwordHash
       const { password, ...rest } = payload;
       Object.assign(rest, { passwordHash });
       payload = rest;
@@ -202,5 +195,37 @@ export class ArtistsService {
     if (result.deletedCount === 0)
       throw new NotFoundException('Artista não encontrado');
     return { deleted: true };
+  }
+
+  async verifyArtistIdentity(
+    artistId: string,
+    currentPhotoBuffer: Buffer,
+    documentPhotoBuffer: Buffer,
+  ): Promise<{
+    verified: boolean;
+    similarity: number;
+    artistUpdated: boolean;
+    verificationDetails: any;
+  }> {
+    // Simulação para desenvolvimento
+    const verified = Math.random() > 0.5; // 50% chance
+
+    if (verified) {
+      await this.artistModel.findByIdAndUpdate(artistId, {
+        verified: true,
+        verifiedAt: new Date(),
+      });
+    }
+
+    return {
+      verified,
+      similarity: verified ? 0.85 : 0.45,
+      artistUpdated: verified,
+      verificationDetails: {
+        detectionMethod: 'Mock verification (development mode)',
+        threshold: 0.6,
+        timestamp: new Date().toISOString(),
+      },
+    };
   }
 }

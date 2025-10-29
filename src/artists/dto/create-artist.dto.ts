@@ -47,7 +47,6 @@ export class CreateArtistDto {
   })
   artTypes: string[];
 
-  // Novos campos sugeridos para cadastro mais completo:
   @IsOptional()
   @IsString({ message: "O campo 'nome artístico' deve ser um texto" })
   artisticName?: string;

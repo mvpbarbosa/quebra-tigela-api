@@ -9,7 +9,7 @@ export class PasswordResetMailService {
     await this.mailer.sendMail({
       to: email,
       subject: 'Recuperação de senha',
-      template: 'password-reset', // handlebars template
+      template: 'password-reset',
       context: { code },
     });
   }

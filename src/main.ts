@@ -9,7 +9,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-  // 🔹 Aplica o filtro global
   app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(process.env.PORT || 3000);

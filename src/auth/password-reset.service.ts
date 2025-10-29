@@ -38,7 +38,7 @@ export class PasswordResetService {
     }
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 6 * 60 * 1000); // 6 minutos
+    const expiresAt = new Date(Date.now() + 6 * 60 * 1000); 
 
     await this.resetModel.create({ email, code, expiresAt, used: false });
     await this.mailService.sendResetCode(email, code);

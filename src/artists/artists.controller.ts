@@ -7,12 +7,17 @@ import {
   Query,
   Patch,
   Delete,
+  UseInterceptors,
+  UploadedFiles,
+  BadRequestException,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { Artist } from './schemas/artist.schema';
 import { ServiceOffering } from '../services/schemas/service.schema';
 import { ScheduleEntry } from '../schedule/schemas/schedule.schema';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import type { Express } from 'express'; // Adicionar import type
 
 @Controller('artists')
 export class ArtistsController {
@@ -64,5 +69,26 @@ export class ArtistsController {
   @Delete(':id')
   remove(@Param('id') id: string): Promise<{ deleted: boolean }> {
     return this.service.remove(id);
+  }
+
+  @Post(':id/verify-identity')
+  @UseInterceptors(FilesInterceptor('photos', 2))
+  async verifyIdentity(
+    @Param('id') id: string,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    if (!files || files.length !== 2) {
+      throw new BadRequestException(
+        'É necessário enviar foto atual e foto do documento',
+      );
+    }
+
+    const [currentPhoto, documentPhoto] = files;
+
+    return this.service.verifyArtistIdentity(
+      id,
+      currentPhoto.buffer,
+      documentPhoto.buffer,
+    );
   }
 }

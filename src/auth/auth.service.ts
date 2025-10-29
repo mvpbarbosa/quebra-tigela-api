@@ -36,7 +36,6 @@ export class AuthService {
       verified: !!rest.verified,
     });
     await doc.save();
-    // Retorne apenas os dados do artista criado, sem token
     const obj = doc.toObject();
     delete (obj as { passwordHash?: string }).passwordHash;
     return obj;

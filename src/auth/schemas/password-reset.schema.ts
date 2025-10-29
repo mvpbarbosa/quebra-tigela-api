@@ -9,7 +9,7 @@ export class PasswordReset {
   email: string;
 
   @Prop({ required: true })
-  code: string; // 6 dígitos
+  code: string; 
 
   @Prop({ required: true })
   expiresAt: Date;
