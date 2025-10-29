@@ -1,0 +1,1020 @@
+{
+  "info": {
+    "_postman_id": "2d96f2a0-44f8-4c2c-8b40-7e8f9a3e1234",
+    "name": "Quebra Tigela API",
+    "description": "Coleção Postman com todas as rotas públicas disponíveis da API Quebra Tigela, incluindo fluxos de autenticação, cadastro, agenda, solicitações, avaliações e verificação facial.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "description": "Base URL da API"
+    },
+    {
+      "key": "clientEmail",
+      "value": "cliente@example.com",
+      "description": "Email utilizado para login do cliente"
+    },
+    {
+      "key": "clientPassword",
+      "value": "senhaSegura123",
+      "description": "Senha utilizada para login do cliente"
+    },
+    {
+      "key": "artistEmail",
+      "value": "artista@example.com",
+      "description": "Email utilizado para login do artista"
+    },
+    {
+      "key": "artistPassword",
+      "value": "senhaSegura123",
+      "description": "Senha utilizada para login do artista"
+    },
+    {
+      "key": "accessTokenClient",
+      "value": "",
+      "description": "Token JWT do cliente obtido no login"
+    },
+    {
+      "key": "accessTokenArtist",
+      "value": "",
+      "description": "Token JWT do artista obtido no login"
+    },
+    {
+      "key": "userId",
+      "value": "65123456789abcdef0abc123",
+      "description": "Substitua pelo ID real do usuário"
+    },
+    {
+      "key": "artistId",
+      "value": "65123456789abcdef0123456",
+      "description": "Substitua pelo ID real do artista"
+    },
+    {
+      "key": "serviceId",
+      "value": "65123456789abcdef045678",
+      "description": "Substitua pelo ID real do serviço"
+    },
+    {
+      "key": "scheduleId",
+      "value": "65123456789abcdef0fedcba",
+      "description": "Substitua pelo ID real da agenda"
+    },
+    {
+      "key": "requestId",
+      "value": "65123456789abcdef0aa1111",
+      "description": "Substitua pelo ID real da solicitação"
+    }
+  ],
+  "item": [
+    {
+      "name": "ROOT",
+      "item": [
+        {
+          "name": "Healthcheck",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "description": "Fluxo de autenticação e redefinição de senha.",
+      "item": [
+        {
+          "name": "Registrar usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cliente Demo\",\n  \"email\": \"cliente+{{$randomInt}}@example.com\",\n  \"password\": \"senhaSegura123\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/user",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register", "user"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar artista",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Artista Demo\",\n  \"email\": \"artista+{{$randomInt}}@example.com\",\n  \"password\": \"senhaSegura123\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"artTypes\": [\n    \"música\",\n    \"performance\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/artist",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register", "artist"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.access_token) {",
+                  "    pm.collectionVariables.set('accessTokenClient', data.access_token);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{clientEmail}}\",\n  \"password\": \"{{clientPassword}}\",\n  \"accountType\": \"client\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login artista",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.access_token) {",
+                  "    pm.collectionVariables.set('accessTokenArtist', data.access_token);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{artistEmail}}\",\n  \"password\": \"{{artistPassword}}\",\n  \"accountType\": \"artist\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Solicitar código de redefinição",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{clientEmail}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/password-reset/request",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "password-reset", "request"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validar código de redefinição",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{clientEmail}}\",\n  \"code\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/password-reset/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "password-reset", "validate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Redefinir senha",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{clientEmail}}\",\n  \"code\": \"123456\",\n  \"newPassword\": \"novaSenha123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/password-reset/reset",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "password-reset", "reset"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "CRUD de usuários (clientes).",
+      "item": [
+        {
+          "name": "Criar usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenClient}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cliente Demo\",\n  \"email\": \"cliente+{{$randomInt}}@example.com\",\n  \"password\": \"senhaSegura123\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar usuários",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenClient}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar usuário por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenClient}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar usuário",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenClient}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city\": \"Rio de Janeiro\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remover usuário",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenClient}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Artists",
+      "description": "CRUD e operações auxiliares com artistas.",
+      "item": [
+        {
+          "name": "Criar artista",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Artista Demo\",\n  \"email\": \"artista+{{$randomInt}}@example.com\",\n  \"password\": \"senhaSegura123\",\n  \"bio\": \"Apresentações ao vivo\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"artTypes\": [\n    \"música\",\n    \"performance\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/artists",
+              "host": ["{{baseUrl}}"],
+              "path": ["artists"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar artistas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/artists",
+              "host": ["{{baseUrl}}"],
+              "path": ["artists"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar artista por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/artists/{{artistId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["artists", "{{artistId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Perfil completo do artista",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/artists/{{artistId}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["artists", "{{artistId}}", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pesquisar artistas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/artists/search?city=São Paulo&artType=música&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["artists", "search"],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "São Paulo"
+                },
+                {
+                  "key": "artType",
+                  "value": "música"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar artista",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenArtist}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Atualização do portfólio\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/artists/{{artistId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["artists", "{{artistId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remover artista",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenArtist}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/artists/{{artistId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["artists", "{{artistId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verificar identidade do artista",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenArtist}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/artists/{{artistId}}/verify-identity",
+              "host": ["{{baseUrl}}"],
+              "path": ["artists", "{{artistId}}", "verify-identity"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Face Comparison",
+      "description": "Verificação facial, identidade e análise de qualidade.",
+      "item": [
+        {
+          "name": "Comparar duas imagens",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/face-comparison/compare",
+              "host": ["{{baseUrl}}"],
+              "path": ["face-comparison", "compare"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verificar identidade (selfie x documento)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/face-comparison/verify-identity",
+              "host": ["{{baseUrl}}"],
+              "path": ["face-comparison", "verify-identity"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verificar artista (selfie x documento + artista)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "artistId",
+                  "value": "{{artistId}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/face-comparison/verify-artist",
+              "host": ["{{baseUrl}}"],
+              "path": ["face-comparison", "verify-artist"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Analisar qualidade da imagem",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/face-comparison/analyze-quality",
+              "host": ["{{baseUrl}}"],
+              "path": ["face-comparison", "analyze-quality"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Service Offerings",
+      "description": "Cadastro e listagem de serviços oferecidos pelos artistas.",
+      "item": [
+        {
+          "name": "Criar serviço",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenArtist}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistId\": \"{{artistId}}\",\n  \"title\": \"Show acústico\",\n  \"description\": \"Apresentação acústica de 1 hora\",\n  \"media\": [\n    { \"type\": \"image\", \"url\": \"https://example.com/foto.jpg\" }\n  ],\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/service-offerings",
+              "host": ["{{baseUrl}}"],
+              "path": ["service-offerings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar serviços por artista",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/service-offerings/artist/{{artistId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["service-offerings", "artist", "{{artistId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Schedule",
+      "description": "Endpoints para gerenciamento de agenda de artistas.",
+      "item": [
+        {
+          "name": "Criar agenda",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenArtist}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistId\": \"{{artistId}}\",\n  \"date\": \"2025-01-20T14:00:00.000Z\",\n  \"status\": \"available\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedule",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedule"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar agenda por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/schedule/{{scheduleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedule", "{{scheduleId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar agenda por artista",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/schedule/artist/{{artistId}}?from=2025-01-01T00:00:00.000Z&to=2025-02-01T00:00:00.000Z&status=available&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedule", "artist", "{{artistId}}"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-01-01T00:00:00.000Z"
+                },
+                {
+                  "key": "to",
+                  "value": "2025-02-01T00:00:00.000Z"
+                },
+                {
+                  "key": "status",
+                  "value": "available"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar agenda futura",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/schedule/artist/{{artistId}}/future",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedule", "artist", "{{artistId}}", "future"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar agenda",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenArtist}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"unavailable\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/schedule/{{scheduleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedule", "{{scheduleId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remover agenda",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenArtist}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/schedule/{{scheduleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["schedule", "{{scheduleId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Requests",
+      "description": "Gestão de solicitações de serviços entre usuários e artistas.",
+      "item": [
+        {
+          "name": "Criar solicitação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenClient}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"artistId\": \"{{artistId}}\",\n  \"serviceId\": \"{{serviceId}}\",\n  \"eventDate\": \"2025-01-25T20:00:00.000Z\",\n  \"location\": \"Rua Exemplo, 123\",\n  \"details\": \"Evento corporativo\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["requests"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar status da solicitação",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenArtist}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"accepted\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/requests/{{requestId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["requests", "{{requestId}}", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar solicitações por usuário",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenClient}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/requests/user/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["requests", "user", "{{userId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar solicitações por artista",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenArtist}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/requests/artist/{{artistId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["requests", "artist", "{{artistId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "description": "Avaliações registradas pelos usuários após serviços concluídos.",
+      "item": [
+        {
+          "name": "Criar avaliação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessTokenClient}}",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"artistId\": \"{{artistId}}\",\n  \"userId\": \"{{userId}}\",\n  \"rating\": 5,\n  \"comment\": \"Excelente performance!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar avaliações por artista",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/artist/{{artistId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "artist", "{{artistId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
